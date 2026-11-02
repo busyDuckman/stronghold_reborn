@@ -46,9 +46,9 @@ in a `bin/*` used for testing.
 
 ## Comments
 
-  - A comment is almost always ONE LINE unless there is good fucking reason.
+  - A comment is almost always ONE LINE unless there is good reason.
   - More than 1 line is a trigger for a dev to stop and think.
-    - Violating this creates a comment that cries wolf, and is TOXIC as fuck to the code base.
+    - Violating this creates a comment that cries wolf, and is TOXIC to the code base.
   - If code has a significant drawback or issue, flag it with a one-line comment.
   - Never remove an existing comment when editing code, even when rewriting the block. The
     author's comments are intentional memory joggers. Only remove one if the code it

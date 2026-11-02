@@ -2,11 +2,22 @@
 
 ## Project Overview
 
-<!-- One or two paragraphs: what this is, who it is for, what it targets. Include the
-     things that are true but not visible in the tree: platform targets, what has to keep
-     compiling to wasm, which sister repos it shares code with. -->
+An engine remake of Stronghold (Stormfront Studios / SSI, 1993, MS-DOS), heading for a modern
+Rust engine that runs on the original game's data. The goal is a working port, not a full
+decompile; scope and the rigour each part gets are in `reversing/notes/about_port_scope.md`.
 
-TODO: describe Stronghold.
+- `reversing/`: the reversing pass. STRONG.EXE is recovered function by function into Open
+  Watcom C, and each function is checked against the original running under the Unicorn
+  emulator. Agents do most of this work; see the `reverser` and `reverser_bulk` agents.
+- `sh_formats/`: Rust readers for the game's files (STRONG.DAT, palettes, sprites, sounds) and
+  the ungrab.
+- `landscape_shader/`: a terrain renderer test bed (wgpu, egui) with a port of the original map
+  generator. It may become the renderer or be thrown away.
+- The Rust port of the recovered C is still to come.
+
+This repo is private. On every push to `main`, `.github/workflows/public_mirror.yml` mirrors
+everything except what `.gitignore` plus `.extra_gitignore.public` hold back to the public
+repo `busyDuckman/stronghold_reborn` (GPL-2.0-only). The recovered C never goes public.
 
 ## Standard Operating Environment
 

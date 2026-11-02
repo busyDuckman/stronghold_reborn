@@ -98,7 +98,7 @@ It's written in Rust, with wgpu for the rendering, and egui for the menus. The t
 
 ## Modern Port
 
-Let's port the reversed C++ code to Rust and get a version running, distributing only the engine; you still need to acquire Stronghold.
+The goal is to port the reversed C++ code to Rust, and get a version running.  (engine only, you still need to acquire a legal copy of Stronghold).
 
 What has been done (so far):
 

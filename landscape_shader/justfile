@@ -1,0 +1,57 @@
+# landscape_shader/justfile
+# The terrain renderer test bed: a self-contained crate that may become the game's renderer
+# or be thrown away. It is outside the root workspace and off the root vet path; the root
+# justfile has one `landscape` recipe that runs it and nothing else.
+#
+# Run these from this directory:
+#
+#     cd landscape_shader && just --list
+#     just run
+#
+# Comment style, because `just --list` only shows the LAST comment line above a recipe:
+#   - prose block first (the why, the gotchas, example invocations)
+#   - blank line
+#   - ONE summary line, directly above the recipe
+# A recipe with no summary line is a recipe nobody else can use.
+
+set shell := ["bash", "-cu"]
+set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
+
+# List every recipe (this is what you get for a bare `just`).
+default:
+    @just --list
+
+# -------------------------------------------------------
+# build and run
+
+# Debug build.
+build:
+    cargo build
+
+# Type-check without producing a binary.
+check:
+    cargo check
+
+# Build and run the test bed. RUST_LOG=debug for more from the log.
+run:
+    cargo run
+
+# Build and run, optimised.
+run-release:
+    cargo run --release
+
+# Roll the game's five named worlds and print each as ASCII with its counts.
+peek-seeds:
+    cargo run --example peek_seeds
+
+# -------------------------------------------------------
+# test and check
+
+# Run the unit tests. The seed-100 test compares the ported map roll against a world the
+# real executable rolled, byte for byte on heights and water.
+test:
+    cargo test
+
+# Build, test, and build the docs: everything this crate checks. Not part of the root vet.
+vet: build test
+    cargo doc --no-deps

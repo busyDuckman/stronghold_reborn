@@ -1,0 +1,71 @@
+name: CI
+
+# One job, one gate: the same `just vet` that runs on the dev box. If vet and CI
+# ever check different things, the dev box stops being trustworthy, so resist the
+# urge to add cargo steps here. Add them to `vet` in the justfile instead.
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  vet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # Binary assets live in git-LFS. Without this the build gets 130-byte
+          # pointer files and fails somewhere a long way from the cause.
+          lfs: true
+
+      # Installs the pinned toolchain + targets from rust-toolchain.toml. A
+      # toolchain action would install stable only for the pin to override it.
+      - name: Install Rust (pinned via rust-toolchain.toml)
+        run: rustup toolchain install
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install just
+        uses: extractions/setup-just@v2
+
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest
+
+      # System deps `just vet` needs. Keep in step with `just setup`.
+      - name: System dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Python venv (scripts/)
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python3 -m pip install -r scripts/requirements.txt
+
+      # vet-editor and check-last-ci are no-ops here (no editor, no .upstash.env),
+      # so this is deliberately the identical command you run locally.
+      - name: just vet
+        run: just vet
+
+      # The full smell sweep over the whole tree, as opposed to the pending-changes
+      # sweep inside vet. Turn on once the existing hits are cleared, or it is red
+      # forever and everyone learns to ignore CI.
+      # - name: just find-smells
+      #   run: just find-smells
+
+      # Beacon read by `just check-last-ci` at the end of every local vet.
+      # Needs the UPSTASH_URL and UPSTASH_WRITE_TOKEN repo secrets; without them
+      # this step is skipped rather than failing the run.
+      - name: Report build status
+        if: always() && vars.UPSTASH_ENABLED == 'true'
+        env:
+          STATUS: ${{ job.status == 'success' && 'PASSED' || 'FAILED' }}
+        run: |
+          curl -s "${{ secrets.UPSTASH_URL }}/set/LAST_CI_BUILD/$STATUS" \
+            -H "Authorization: Bearer ${{ secrets.UPSTASH_WRITE_TOKEN }}"

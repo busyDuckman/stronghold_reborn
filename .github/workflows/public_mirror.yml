@@ -1,0 +1,39 @@
+name: Public mirror
+
+# Copies the public part of this repo to busyDuckman/stronghold_reborn on every push to main. What is public is
+# decided by .gitignore plus .extra_gitignore.public; the logic is in scripts/git/publish_public.sh, and
+# `just public-preview` runs it locally as a dry run.
+#
+# Needs the PUBLIC_REPO_TOKEN secret: a fine-grained token with Contents read/write on the public repo only.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One publish at a time, in push order, so two quick pushes cannot race to the public main.
+concurrency:
+  group: public-mirror
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # This file is mirrored too; it must only ever run in the private repo.
+    if: github.repository == 'busyDuckman/open_stronghold_1993'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # The messages of every commit in the push, not just the last.
+          fetch-depth: 0
+          # The public commit's LFS objects are uploaded from this checkout.
+          lfs: true
+          # Otherwise the stored GITHUB_TOKEN header overrides PUBLIC_REPO_TOKEN on the push and it is refused.
+          persist-credentials: false
+
+      - name: Publish
+        env:
+          PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
+          BEFORE: ${{ github.event.before }}
+        run: bash scripts/git/publish_public.sh --push "$BEFORE"

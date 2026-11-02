@@ -1,0 +1,30 @@
+# Project-wide cargo config. Anything MACHINE-specific belongs in
+# ~/.cargo/config.toml instead, because cargo merges the two and CI does not
+# share your home directory.
+#
+# In particular sccache: putting `rustc-wrapper = "sccache"` here means every CI
+# job has to set CARGO_BUILD_RUSTC_WRAPPER="" to stop the build dying on a
+# binary the runner does not have. Put this in ~/.cargo/config.toml instead:
+#
+#     [build]
+#     rustc-wrapper = "sccache"
+#
+# and the caching is yours, on every project, with no CI workaround anywhere.
+
+[build]
+# Unused imports churn constantly while refactoring and drown the real warnings.
+# The lint still fires in CI (which does not read this) if you want it as a gate.
+rustflags = ["-A", "unused_imports"]
+
+# Fetch git dependencies through the command-line git, so ssh keys and agents
+# work the way they do everywhere else. Needed for private path/git deps.
+[net]
+git-fetch-with-cli = true
+
+# Uncomment once there is a wasm target.
+# [target.wasm32-unknown-unknown]
+# rustflags = ["--cfg", "getrandom_backend=\"wasm_js\""]
+
+# rust-lld ships with the rustup toolchain and links far faster than MSVC link.exe.
+# [target.x86_64-pc-windows-msvc]
+# linker = "rust-lld"

@@ -1,0 +1,41 @@
+[package]
+name = "shader_editor"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-2.0-only"
+authors = ["duckman"]
+publish = false
+
+# Empty [workspace] is what keeps this crate OUT of the project's workspace: its own
+# lockfile, its own target dir, and none of macroquad/egui in the project's dependency
+# graph. See ../README.md.
+[workspace]
+
+[dependencies]
+macroquad       = { version = "0.4", default-features = false }
+egui            = "=0.31.1"
+egui-macroquad  = { version = "0.17.3", default-features = false }
+regex           = "1.12"
+
+# The egui version is pinned to whatever egui-macroquad was built against. Moving one means
+# moving all three and expecting the egui API to have shifted under you.
+
+# The unified path: GLSL 450 through naga's front end, rendered offscreen to several targets
+# at once. macroquad cannot do either, so this second backend sits beside it and never
+# presents: it renders to textures, reads them back, and hands the pixels to macroquad to
+# blit. wgpu is re-exported as wgpu::naga, so naga is not a dependency of its own.
+# Approved for this repo on 2026-09-20 (landscape_shader), same major version.
+wgpu            = { version = "24", features = ["glsl"] }
+
+# The unified path writes its own PNGs. macroquad's Image::export_png flips the rows on the
+# way out, which the paired path wants (its readback flips too, so the two cancel) and this
+# one does not: here the picture comes back in memory order and has to stay in it. From the
+# root Cargo.toml's vetted menu.
+png             = "0.17"
+
+[profile.dev]
+opt-level = 1        # the wgpu stack is slow at opt-level 0
+
+[profile.release]
+opt-level = 3
+strip = "debuginfo"

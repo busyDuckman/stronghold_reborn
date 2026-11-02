@@ -1,0 +1,9 @@
+[toolchain]
+# Pinned, and migrations are recorded in the comments so a regression can be
+# bisected to a toolchain bump. CI installs from this file (`rustup toolchain
+# install`), so the runner and the dev box are never on different compilers.
+channel = "1.95.0"          # pinned August 2026
+
+# Declare extra targets here so `rustup toolchain install` brings everything the
+# build needs in one step, locally and in CI.
+# targets = ["wasm32-unknown-unknown"]

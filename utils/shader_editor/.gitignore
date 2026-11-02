@@ -1,0 +1,2 @@
+# Standalone crate: its own target, out of the workspace and out of the root .gitignore's reach.
+/target/

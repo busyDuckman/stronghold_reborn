@@ -1,0 +1,28 @@
+# sh_formats: readers for the game's own file formats. STRONG.DAT and what is inside it.
+# Library first; the dat_util bin is a test tool and sits behind the "cli" feature so a consumer
+# that turns default features off never drags clap into its graph.
+[package]
+name = "sh_formats"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-2.0-only"
+authors = ["duckman"]
+publish = false
+
+[features]
+default = ["cli"]
+cli = ["dep:clap"]
+
+[dependencies]
+thiserror       = { workspace = true }
+log             = { workspace = true }
+png             = { workspace = true }
+clap            = { workspace = true, optional = true }
+
+[[bin]]
+name = "dat_util"
+required-features = ["cli"]
+
+[[bin]]
+name = "ungrab"
+required-features = ["cli"]

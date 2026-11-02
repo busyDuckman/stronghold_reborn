@@ -1,0 +1,7 @@
+# Master python deps for scripts/. Installed into .venv/ by `just setup`.
+# Any non-stdlib import used by a scripts/*.py belongs here; a script that
+# imports something not listed will fail on a fresh clone, which is the point.
+
+matplotlib
+numpy
+Pillow

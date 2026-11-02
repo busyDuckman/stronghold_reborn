@@ -1,0 +1,35 @@
+# landscape_shader: a self-contained test bed for a terrain renderer. It may become the
+# game's renderer or be thrown away, so it stays out of the root workspace (the empty
+# [workspace] table below) and off the root vet path. Run it via its own justfile, or
+# `just landscape` from the repo root.
+[workspace]
+
+[package]
+name = "landscape_shader"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-2.0-only"
+authors = ["duckman"]
+publish = false
+
+[dependencies]
+anyhow          = "1"
+log             = "0.4"
+flexi_logger    = { version = "0.31", features = ["colors"] }
+wyrand          = "0.3"                 # the custom map generator's PRNG
+bytemuck        = { version = "1", features = ["derive"] }   # vertex structs to bytes
+
+# The window and the GPU. Approved by the owner on 2026-09-20 for this crate (winit, wgpu and
+# the two egui bridges are not on the root Cargo.toml menu). egui is held at the house pin
+# 0.31.1; wgpu 24 and winit 0.30.7 are what that pin's bridges require.
+egui            = { version = "=0.31.1", features = ["serde"] }
+egui-wgpu       = { version = "=0.31.1", features = ["winit"] }
+egui-winit      = { version = "=0.31.1" }
+wgpu            = "24"
+winit           = "0.30.7"
+
+[profile.dev]
+opt-level = 1        # the wgpu stack is slow at opt-level 0
+
+[profile.release]
+opt-level = 3

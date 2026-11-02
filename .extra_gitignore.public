@@ -1,0 +1,15 @@
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Public mirror only. scripts/git/publish_public.sh appends this file to .gitignore to decide what reaches the public
+# repo: anything tracked here that these rules (or the regular ones) ignore stays private.
+# ----------------------------------------------------------------------------------------------------------------------
+
+# the reversing pass: the recovered C is not ours to redistribute
+reversing/
+
+# the owner's notes
+.plans/
+todo.md
+
+# personal editor config
+.vscode/
